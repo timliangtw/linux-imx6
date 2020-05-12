@@ -58,6 +58,18 @@
 		compatible = "gpio-set-direction";
 		usb-host-pwr-en = <&gpio1 19 1>; /* MINICARD_PWR_EN */
 	};
+
+#ifdef RTL8367_SWITCH
+	rtl8367 {
+		compatible = "realtek,rtl8367b";
+                pinctrl-names = "default";
+                pinctrl-0 = <&pinctrl_rtl_sda &pinctrl_rtl_scl>;
+		gpio-sda = <&gpio1 6  GPIO_ACTIVE_HIGH>;
+		gpio-sck = <&gpio1 3 GPIO_ACTIVE_HIGH>;
+		realtek,extif0 = <1 0 1 1 1 1 1 1 2>;
+	};
+#endif
+
 };
 
 &audio_sgtl5000 {
@@ -119,6 +131,19 @@
 	};
 };
 
+#ifdef RTL8367_SWITCH
+&i2c3 {
+	status = "disabled";
+};
+#else
+&i2c3 {
+	24c02@50 {
+		compatible = "fsl,24c02";
+		reg = <0x50>;
+	};
+};
+#endif
+
 &iomuxc {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_hog_1 &pinctrl_hog_2>;
@@ -158,6 +183,21 @@
 			>;
 		};
 	};
+
+#ifdef RTL8367_SWITCH
+	rtl_switch {
+		pinctrl_rtl_sda: rtl_sdagrp-1 {
+			fsl,pins = <
+				MX6QDL_PAD_GPIO_6__GPIO1_IO06		0x80000000	/* RTL8368_SDA */
+			>;
+		};
+		pinctrl_rtl_scl: rtl_sclgrp-1 {
+			fsl,pins = <
+				MX6QDL_PAD_GPIO_3__GPIO1_IO03		0x80000000	/* RTL8368_SCL */
+			>;
+		};
+	};
+#endif
 
 	leds {
 		pinctrl_leds_debug_1: leds_debug1grp-1{
